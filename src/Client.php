@@ -6,12 +6,12 @@ namespace Darabonba\GatewaySls;
 use Darabonba\GatewaySpi\Client as DarabonbaGatewaySpiClient;
 use AlibabaCloud\Tea\Utils\Utils;
 use AlibabaCloud\Darabonba\String\StringUtil;
-use AlibabaCloud\Darabonba\SignatureUtil\Signer;
-use AlibabaCloud\Darabonba\EncodeUtil\Encoder;
+use AlibabaCloud\Darabonba\SignatureUtil\SignatureUtil;
+use AlibabaCloud\Darabonba\EncodeUtil\EncodeUtil;
 use AlibabaCloud\Tea\Tea;
 use AlibabaCloud\Tea\Exception\TeaError;
-use AlibabaCloud\Darabonba\Map\MapUtil;
-use AlibabaCloud\Darabonba\Array_\ArrayUtil;
+use AlibabaCloud\Darabonba\MapUtil\MapUtil;
+use AlibabaCloud\Darabonba\ArrayUtil\ArrayUtil;
 
 use Darabonba\GatewaySpi\Models\InterceptorContext;
 use Darabonba\GatewaySpi\Models\AttributeMap;
@@ -61,13 +61,13 @@ class Client extends DarabonbaGatewaySpiClient {
             }
             else if (StringUtil::equals($request->reqBodyType, "json")) {
                 $bodyStr = Utils::toJSONString($request->body);
-                $request->headers["content-md5"] = StringUtil::toUpper(Encoder::hexEncode(Signer::MD5Sign($bodyStr)));
+                $request->headers["content-md5"] = StringUtil::toUpper(EncodeUtil::hexEncode(SignatureUtil::MD5Sign($bodyStr)));
                 $request->stream = $bodyStr;
                 $request->headers["content-type"] = "application/json";
             }
             else if (StringUtil::equals($request->reqBodyType, "formData")) {
                 $str = Utils::toJSONString($request->body);
-                $request->headers["content-md5"] = StringUtil::toUpper(Encoder::hexEncode(Signer::MD5Sign($str)));
+                $request->headers["content-md5"] = StringUtil::toUpper(EncodeUtil::hexEncode(SignatureUtil::MD5Sign($str)));
                 $request->stream = $str;
                 $request->headers["content-type"] = "application/json";
             }
@@ -202,7 +202,7 @@ class Client extends DarabonbaGatewaySpiClient {
         $canonicalizedResource = $this->buildCanonicalizedResource($resource, $query);
         $canonicalizedHeaders = $this->buildCanonicalizedHeaders($headers);
         $stringToSign = "" . $method . "\n" . $canonicalizedHeaders . "" . $canonicalizedResource . "";
-        return Encoder::base64EncodeToString(Signer::HmacSHA1Sign($stringToSign, $secret));
+        return EncodeUtil::base64EncodeToString(SignatureUtil::HmacSHA1Sign($stringToSign, $secret));
     }
 
     /**
