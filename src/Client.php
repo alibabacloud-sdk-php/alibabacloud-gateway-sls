@@ -18,7 +18,6 @@ use Darabonba\GatewaySpi\Models\AttributeMap;
 
 class Client extends DarabonbaGatewaySpiClient {
     public function __construct(){
-        parent::__construct();
     }
 
     /**
