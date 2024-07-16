@@ -140,8 +140,14 @@ class Client extends DarabonbaGatewaySpiClient {
             ]);
         }
         if (!Utils::isUnset($response->body)) {
-            $bodyrawSize = @$response->headers["x-log-bodyrawsize"];
-            $compressType = @$response->headers["x-log-compresstype"];
+            $bodyrawSize = null;
+            if (isset($response->headers["x-log-bodyrawsize"])) {
+                $bodyrawSize = $response->headers["x-log-bodyrawsize"];
+            }
+            $compressType = null;
+            if (isset($response->headers["x-log-compresstype"])) {
+                $bodyrawSize = $response->headers["x-log-compresstype"];
+            }
             $uncompressedData = $response->body;
             if (!Utils::isUnset($bodyrawSize) && !Utils::isUnset($compressType)) {
                 $uncompressedData = DarabonbaGatewaySlsUtilClient::readAndUncompressBlock($response->body, $compressType, $bodyrawSize);
@@ -276,11 +282,17 @@ class Client extends DarabonbaGatewaySpiClient {
      */
     public function buildCanonicalizedHeaders($headers){
         $canonicalizedHeaders = "";
-        $contentType = @$headers["content-type"];
+        $contentType = null;
+        if (isset($headers["content-type"])) {
+            $contentType = $headers["content-type"];
+        }
         if (Utils::isUnset($contentType)) {
             $contentType = "";
         }
-        $contentMd5 = @$headers["content-md5"];
+        $contentMd5 = null;
+        if (isset($headers["content-md5"])) {
+            $contentMd5 = $headers["content-md5"];
+        }
         if (Utils::isUnset($contentMd5)) {
             $contentMd5 = "";
         }
